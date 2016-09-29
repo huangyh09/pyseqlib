@@ -1,3 +1,6 @@
+# #
+# should output lariat reads!!!
+
 
 import os
 import sys
@@ -18,11 +21,14 @@ START_TIME = time.time()
 
 def show_progress(RV=None):
     global PROCESSED, MAPPED_READ, START_TIME, FID
-    if len(RV) > 0:
+    if len(RV["bp"]) > 0:
         MAPPED_READ += 1
-        for bp in RV:
-            print bp
-            FID.writelines("\t".join(str(x) for x in bp) + "\n")
+        for bp in RV["bp"]:
+            # print bp
+            FID1.writelines("\t".join(str(x) for x in bp) + "\n")
+        for read in RV["read"]:
+            FID2.writelines(read)
+        if len(RV["read"]) > 0: FID2.writelines("\n")
     
     PROCESSED += 1
     if PROCESSED % 10 == 0:
@@ -60,33 +66,35 @@ def main():
 
     # 0. parse command line options
     parser = OptionParser()
-    parser.add_option("--fastq1", "-1", dest="fastq1", default=None,
-        help="The fastq file for reads mate1.")
-    parser.add_option("--fastq2", "-2", dest="fastq2", default=None,
-        help="The fastq file for reads mate2.")
+    parser.add_option("--fastq", "-r", dest="fastq", default=None,
+        help="The fastq file for single-end read.")
     parser.add_option("--intronRef", "-x", dest="intronRef", default=None,
         help="The fasta file for intron sequences.")
     parser.add_option("--outDir", "-o", dest="out_dir", default=None, 
         help="The directory for output [default: same as ref].")
 
     parser.add_option("--nproc", "-p", dest="nproc", default=20,
-        help="The number of processors to use [default: $default].")
-    parser.add_option("--overHang", "-c", dest="overhang", default=20,
-        help="The minimum overhang [default: $default].")
-    parser.add_option("--misMatch", "-e", dest="mis_match", default=5,
-        help="The maximum mis-match within overhang [default: $default].")
+        help="The number of processors to use [default: %default].")
+    parser.add_option("--overHang", "-H", dest="overhang", default=14,
+        help="The minimum overhang [default: %default].")
+    parser.add_option("--misMatch", "-e", dest="mis_match", default=3,
+        help="The maximum mis-match within overhang [default: %default].")
+    parser.add_option("--endCut", "-c", dest="end_cut", default=1,
+        help=("The locus to cut near 5ss and bp, in case of different start "
+        "index [default: %default]."))
+    parser.add_option("--maxMap", "-m", dest="max_map", default=1,
+        help="The maximum mapped positions for each read [default: %default].")
 
     (options, args) = parser.parse_args()
     if len(sys.argv[1:]) == 0:
         print("use -h or --help for help on argument.")
         sys.exit(1)
 
-    if options.fastq1 is None and options.fastq2 is None:
-        print("Error: need either single-end or paired-end reads in fastq.")
+    if options.fastq is None:
+        print("Error: need either single-end reads in fastq.")
         sys.exit(1)
     else:
-        fastq1 = options.fastq1
-        fastq2 = options.fastq2
+        fastq = options.fastq
 
     if options.intronRef is None:
         print("Error: need intron reference file in fasta.")
@@ -96,47 +104,58 @@ def main():
         print("reference loaded!")
 
     if options.out_dir is None:
-        out_dir = os.path.dirname(intronRef) + "/lariatMap/"
+        out_dir = os.path.dirname(intronRef) + "/lariatMap"
     else:
         out_dir = options.out_dir
+    try:
+        os.stat(out_dir)
+    except:
+        os.mkdir(out_dir)
 
     nproc = int(options.nproc)
+    end_cut = int(options.end_cut)
+    max_map = int(options.max_map)
     overhang = int(options.overhang)
     mis_match = int(options.mis_match)
 
-    global FID
-    FID = open(out_dir + "lariat_reads.tab", "w")
+    global FID1, FID2
+    FID2 = open(out_dir + "/mapped_reads.fq", "w")
+    FID1 = open(out_dir + "/lariat_reads.tab", "w")
     headline = "intron_id\tintron_order\tbp_5ss\t"
-    headline += "bp_3ss\tstart_bp\tstop_bp\tread_id"
-    FID.writelines(headline + "\n")
+    headline += "bp_3ss\trlen_bp\trlen_5ss\tread_id"
+    FID1.writelines(headline + "\n")
     
     cnt = 0
     if int(options.nproc) <= 1:
-        read1 = []
-        with open(fastq1, "r") as infile:
+        aRead = []
+        with open(fastq, "r") as infile:
             for line in infile:
                 cnt += 1
-                read1.append(line.rstrip())
+                aRead.append(line.rstrip())
                 if cnt % 4 == 0:
-                    RV = map_lariat_reads(read1, ref_ids=ref_ids, 
+                    RV = map_lariat_reads(aRead, ref_ids=ref_ids, 
                         ref_seq=ref_seq, mis_match=mis_match, 
-                        overhang=overhang)
-                    read1 = []
+                        overhang=overhang, end_cut=end_cut, 
+                        max_map=max_map)
+                    aRead = []
                     show_progress(RV)
     else:
         pool = multiprocessing.Pool(processes=nproc)
-        read1 = []
-        with open(fastq1, "r") as infile:
+        aRead = []
+        with open(fastq, "r") as infile:
             for line in infile:
                 cnt += 1
-                read1.append(line.rstrip())
+                aRead.append(line.rstrip())
                 if cnt % 4 == 0:
-                    pool.apply_async(map_lariat_reads, (read1, None, ref_ids, 
-                        ref_seq, mis_match, overhang), callback=show_progress)
-                    read1 = []
+                    pool.apply_async(map_lariat_reads, (aRead, ref_ids, 
+                        ref_seq, mis_match, overhang, end_cut, max_map), 
+                        callback=show_progress)
+                    aRead = []
             pool.close()
             pool.join()
-    FID.close()
+    FID1.close()
+    FID2.close()
+    print("")
 
 
 if __name__ == "__main__":
