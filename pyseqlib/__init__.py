@@ -5,6 +5,7 @@
 __version__ = "0.0.1"
 
 import pyximport; pyximport.install()
+from .utils.gtf import *
 from .utils.fasta import *
 
 

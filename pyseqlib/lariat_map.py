@@ -14,7 +14,6 @@ from .utils.fasta import RNA2cDNA, rev_seq
 from .utils.seq_map import map_lariat_reads
 
 
-# FID = None
 PROCESSED = 0
 MAPPED_READ = 0
 START_TIME = time.time()
@@ -24,14 +23,14 @@ def show_progress(RV=None):
     if len(RV["bp"]) > 0:
         MAPPED_READ += 1
         for bp in RV["bp"]:
-            # print bp
+            print bp
             FID1.writelines("\t".join(str(x) for x in bp) + "\n")
         for read in RV["read"]:
             FID2.writelines(read)
         if len(RV["read"]) > 0: FID2.writelines("\n")
     
     PROCESSED += 1
-    if PROCESSED % 10 == 0:
+    if PROCESSED % 100 == 0:
         run_time = time.time() - START_TIME
         sys.stdout.write("\r%d lariat reads found from %d reads in %.2f s." 
             %(MAPPED_READ, PROCESSED, run_time))
@@ -73,11 +72,11 @@ def main():
     parser.add_option("--outDir", "-o", dest="out_dir", default=None, 
         help="The directory for output [default: same as ref].")
 
-    parser.add_option("--nproc", "-p", dest="nproc", default=20,
+    parser.add_option("--nproc", "-p", dest="nproc", default=1,
         help="The number of processors to use [default: %default].")
     parser.add_option("--overHang", "-H", dest="overhang", default=14,
         help="The minimum overhang [default: %default].")
-    parser.add_option("--misMatch", "-e", dest="mis_match", default=3,
+    parser.add_option("--misMatch", "-e", dest="mismatch", default=3,
         help="The maximum mis-match within overhang [default: %default].")
     parser.add_option("--endCut", "-c", dest="end_cut", default=1,
         help=("The locus to cut near 5ss and bp, in case of different start "
@@ -116,13 +115,13 @@ def main():
     end_cut = int(options.end_cut)
     max_map = int(options.max_map)
     overhang = int(options.overhang)
-    mis_match = int(options.mis_match)
+    mismatch = int(options.mismatch)
 
     global FID1, FID2
     FID2 = open(out_dir + "/mapped_reads.fq", "w")
     FID1 = open(out_dir + "/lariat_reads.tab", "w")
     headline = "intron_id\tintron_order\tbp_5ss\t"
-    headline += "bp_3ss\trlen_bp\trlen_5ss\tread_id"
+    headline += "bp_3ss\tmismatch\trlen_bp\trlen_5ss\tread_id"
     FID1.writelines(headline + "\n")
     
     cnt = 0
@@ -134,7 +133,7 @@ def main():
                 aRead.append(line.rstrip())
                 if cnt % 4 == 0:
                     RV = map_lariat_reads(aRead, ref_ids=ref_ids, 
-                        ref_seq=ref_seq, mis_match=mis_match, 
+                        ref_seq=ref_seq, mismatch=mismatch, 
                         overhang=overhang, end_cut=end_cut, 
                         max_map=max_map)
                     aRead = []
@@ -148,7 +147,7 @@ def main():
                 aRead.append(line.rstrip())
                 if cnt % 4 == 0:
                     pool.apply_async(map_lariat_reads, (aRead, ref_ids, 
-                        ref_seq, mis_match, overhang, end_cut, max_map), 
+                        ref_seq, mismatch, overhang, end_cut, max_map), 
                         callback=show_progress)
                     aRead = []
             pool.close()
