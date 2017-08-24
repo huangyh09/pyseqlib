@@ -37,6 +37,9 @@ def get_mfold(fasta_file, out_file=None, run_dir=None, verbose=True):
         out_file = ".".join(fasta_file.split(".")[:-1]) + ".mfold.txt"
     if run_dir is None:
         run_dir = os.path.dirname(out_file)
+        # if (os.path.exists("/tmp/")):
+        #     run_dir = "/tmp/"
+        # else:      
     
     RV = []
     fout = open(out_file, "w")

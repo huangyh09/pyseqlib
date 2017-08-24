@@ -48,9 +48,10 @@ setup(
     entry_points={
           'console_scripts': [
           'pymfold = pyseqlib.pymfold:main',
+          'intronX = pyseqlib.intronX.intronX:main',
           'lariat-map = pyseqlib.lariat_map:main',
           'motif-score = pyseqlib.motif_score:main',
-              ],
+            ],
           }, 
 
     # List run-time dependencies here.  These will be installed by pip when

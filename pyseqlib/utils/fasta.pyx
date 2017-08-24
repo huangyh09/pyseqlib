@@ -2,6 +2,7 @@
 
 import os
 import pysam
+import itertools
 import numpy as np
 
 class LightFasta:
@@ -117,6 +118,32 @@ def rev_seq(seq):
     RV = "".join(_tmp[::-1])
     return RV
 
+
+def get_motif(seq_full, motif, mode="counts"):
+    """get the counts of motif in a sequence"""
+    cnt = 0
+    for i in range(len(seq_full)-len(motif)+1):
+        if seq_full[i:i+len(motif)] == motif:
+            cnt += 1
+    if mode == "counts":
+        return cnt
+    elif mode == "frequency":
+        return cnt / (len(seq_full)-len(motif)+1.0)
+    elif mode == "normalized":
+        return cnt / (len(seq_full)-len(motif)+1.0) / (0.25**len(motif))
+    else:
+        return None
+
+
+def get_kmer_all(kmax=5, kmin=1, seqs="ATGC"):
+    """generate kmers"""
+    RV = []
+    for i in range(kmin, kmax+1):
+        for _seq in itertools.product(seqs, repeat=i): 
+            RV.append("".join(_seq))
+    return RV
+
+
 def fasta_write(fid, seq, ref, length=60):
     """write sequence into a fasta file
     
@@ -158,7 +185,7 @@ def motif_score(msa, pwm_msa=None):
         negetive score can happen when is poorer than null pwm
     """
     motif_len = len(msa[0])
-    data = np.zeros((len(msa), motif_len), dtype="S1")
+    data = np.zeros((len(msa), motif_len), dtype="str")
     for i in range(len(msa)):
         tmp = []
         tmp[:] = msa[i].upper()
@@ -169,7 +196,7 @@ def motif_score(msa, pwm_msa=None):
         pwm_add = 0.0
     else:
         pwm_add = 0.01 # for smooth the pwm
-        pwmS = np.zeros((len(pwm_msa), motif_len), dtype="S1")
+        pwmS = np.zeros((len(pwm_msa), motif_len), dtype="str")
         for i in range(len(pwm_msa)):
             tmp = []
             tmp[:] = pwm_msa[i].upper()
@@ -177,15 +204,15 @@ def motif_score(msa, pwm_msa=None):
         
     pwm = np.zeros((4, motif_len))
     for i in range(motif_len):
-        pwm[0,i] = (sum(pwmS[:,i] == "A") + pwm_add) / (pwmS.shape[0] + pwm_add*4)
-        pwm[1,i] = (sum(pwmS[:,i] == "T") + pwm_add) / (pwmS.shape[0] + pwm_add*4)
-        pwm[2,i] = (sum(pwmS[:,i] == "G") + pwm_add) / (pwmS.shape[0] + pwm_add*4)
-        pwm[3,i] = (sum(pwmS[:,i] == "C") + pwm_add) / (pwmS.shape[0] + pwm_add*4)
+        pwm[0,i] = (np.sum(pwmS[:,i]=="A")+pwm_add) / (pwmS.shape[0]+pwm_add*4)
+        pwm[1,i] = (np.sum(pwmS[:,i]=="T")+pwm_add) / (pwmS.shape[0]+pwm_add*4)
+        pwm[2,i] = (np.sum(pwmS[:,i]=="G")+pwm_add) / (pwmS.shape[0]+pwm_add*4)
+        pwm[3,i] = (np.sum(pwmS[:,i]=="C")+pwm_add) / (pwmS.shape[0]+pwm_add*4)
         
     score = np.zeros(len(msa))
     s_max = np.sum(np.log2(pwm.max(axis=0)))
     #s_min = np.sum(np.log2(pwm.min(axis=0)))
-    s_min = pwm.shape[1] * np.log2(1.0/pwm.shape[0]) #random is prefered as zeros
+    s_min = pwm.shape[1] * np.log2(1.0/pwm.shape[0]) #random is prefered as zero
     for i in range(data.shape[0]):
         for j in range(motif_len):
             if   data[i,j] == "A": score[i] += np.log2(pwm[0, j])

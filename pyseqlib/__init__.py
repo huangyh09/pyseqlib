@@ -1,8 +1,8 @@
-# Copyright(c) 2016, The HiLearn developer (Yuanhua Huang)
-# Licensed under the MIT License at
-# http://opensource.org/licenses/MIT
+# Copyright(c) 2017, Yuanhua Huang
+# Licensed under the Apache License 2.0 at
+# http://www.apache.org/licenses/LICENSE-2.0
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 import pyximport; pyximport.install()
 from .utils.gtf import *
