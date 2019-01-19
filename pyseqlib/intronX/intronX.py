@@ -14,7 +14,7 @@ import sys
 import subprocess
 import numpy as np
 from seq_maker import seq_maker
-from pyseqlib.pymfold import get_mfold
+from pyseqlib.pyRNAfold import get_RNAfold
 from pyseqlib.utils.fasta import motif_score
 from optparse import OptionParser, OptionGroup
 
@@ -34,14 +34,10 @@ def main():
     group = OptionGroup(parser, "Optional arguments")
     group.add_option("--kmer-range", type="int", nargs=2, dest="kmer_range",
         default=[1,3], help=("The min and max K in k-mers. [default: 1 3]"))
-    group.add_option("--no-mfold", action="store_true", dest="no_mfold", 
+    group.add_option("--no-RNAfold", action="store_true", dest="no_RNAfold", 
         default=False, help="No second strucutre for intron sequences")
     group.add_option("--no-weblogo", action="store_true", dest="no_weblogo", 
         default=False, help="No weblogo figures for motifs")
-    group.add_option("--mfold-run-dir", dest="mfold_run_dir", default=None, 
-        help=("The running directory for mfold with many temporary files. "
-              "Default: the same folder of output files. For one running, " 
-              "better to use /tmp."))
     parser.add_option_group(group)
 
     (options, args) = parser.parse_args()
@@ -74,7 +70,6 @@ def main():
         out_dir = options.out_dir + "/intronX"
 
     kmin, kmax = options.kmer_range
-    mfold_run_dir = options.mfold_run_dir
 
     # 1. generate sequences for intron features
     seq_motif = seq_maker(intron_info, fasta_file, out_dir+"/seq/", kmin, kmax)
@@ -85,17 +80,14 @@ def main():
     seq_score3 = motif_score(seq_motif["seq_3ss"])
 
     # # 3. calculate secondary structure scores
-    if options.no_mfold is False:
-        mfold_score1 = get_mfold(out_dir+"/seq/intron_seq.fa", out_file=None, 
-            run_dir=mfold_run_dir)
-        mfold_score2 = get_mfold(out_dir+"/seq/5ss_BPs_seq.fa", out_file=None, 
-            run_dir=mfold_run_dir)
-        mfold_score3 = get_mfold(out_dir+"/seq/BPs_3ss_seq.fa", out_file=None, 
-            run_dir=mfold_run_dir)
+    if options.no_RNAfold is False:
+        fold_score1 = get_RNAfold(out_dir+"/seq/intron_seq.fa", out_file=None)
+        fold_score2 = get_RNAfold(out_dir+"/seq/5ss_BPs_seq.fa", out_file=None)
+        fold_score3 = get_RNAfold(out_dir+"/seq/BPs_3ss_seq.fa", out_file=None)
     else:
-        mfold_score1 = ["NA"] * (intron_info.shape[0])
-        mfold_score2 = ["NA"] * (intron_info.shape[0])
-        mfold_score3 = ["NA"] * (intron_info.shape[0])
+        fold_score1 = ["NA"] * (intron_info.shape[0])
+        fold_score2 = ["NA"] * (intron_info.shape[0])
+        fold_score3 = ["NA"] * (intron_info.shape[0])
 
     # 4. save results
     fid = open(out_dir + "/intronX.txt", "w")
@@ -116,13 +108,13 @@ def main():
         if bp_exist is True:
             aLine = "\t".join(list(intron_info[i,:]))
             aLine += "\t%d\t%d\t%d\t" %(intronL, ss5_bpL, ss3_bpL)
-            aLine += "\t".join([mfold_score1[i], mfold_score2[i], mfold_score3[i]])
+            aLine += "\t".join([fold_score1[i], fold_score2[i], fold_score3[i]])
             aLine += "\t%.2f\t%.2f\t%.2f" %(seq_score1[i], seq_score2[i], seq_score3[i])
         else:
             intron_info[i,6] = "NA"
             aLine = "\t".join(list(intron_info[i,:]))
             aLine += "\t%d\tNA\tNA\t" %(intronL)
-            aLine += "\t".join([mfold_score1[i], "NA", "NA"])
+            aLine += "\t".join([fold_score1[i], "NA", "NA"])
             aLine += "\t%.2f\tNA\t%.2f" %(seq_score1[i], seq_score3[i])
         
         for j in range(seq_motif["kmer_frq"].shape[1]):
@@ -134,9 +126,9 @@ def main():
         os.remove(out_dir+"/seq/BPs_seq.fa")
         os.remove(out_dir+"/seq/5ss_BPs_seq.fa")
         os.remove(out_dir+"/seq/BPs_3ss_seq.fa")
-        if options.no_mfold is False:
-            os.remove(out_dir+"/seq/5ss_BPs_seq.mfold.txt")
-            os.remove(out_dir+"/seq/BPs_3ss_seq.mfold.txt")
+        if options.no_RNAfold is False:
+            os.remove(out_dir+"/seq/5ss_BPs_seq.RNAfold.txt")
+            os.remove(out_dir+"/seq/BPs_3ss_seq.RNAfold.txt")
 
     # 5. generate sequence motifs figures
     Fidx = [-4, -7, -16]

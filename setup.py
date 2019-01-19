@@ -7,15 +7,17 @@ from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
-import pyseqlib
 
 here = path.abspath(path.dirname(__file__))
+
+# Set __version__ for the project.
+exec(open("./pyseqlib/version.py").read())
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
     
-reqs = ['pysam']
+reqs = ['pysam', 'Cython', 'numpy']
 
 setup(
     name='pyseqlib',
@@ -23,20 +25,20 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version=pyseqlib.__version__, #check __init__.py
+    version=__version__,
 
     description='pySeqLib: A small python library to process sequencing data.',
     long_description=long_description,
 
     # The project's main homepage.
-    # url='http://hilearn.sourceforge.net',
+    url='https://github.com/huangyh09/pyseqlib',
 
     # Author details
     author='Yuanhua Huang',
-    author_email='Y.Huang@ed.ac.uk',
+    author_email='yuanhua@ebi.ac.uk',
 
     # Choose your license
-    license='MIT',
+    license='Apache-2.0',
 
     # What does your project relate to?
     keywords=['sequencing data processing'],
@@ -48,6 +50,7 @@ setup(
     entry_points={
           'console_scripts': [
           'pymfold = pyseqlib.pymfold:main',
+          'pyRNAfold = pyseqlib.pyRNAfold:main',
           'intronX = pyseqlib.intronX.intronX:main',
           'lariat-map = pyseqlib.lariat_map:main',
           'motif-score = pyseqlib.motif_score:main',

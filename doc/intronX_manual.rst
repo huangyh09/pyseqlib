@@ -61,32 +61,28 @@ also a subfolder ``seq`` containing the following files:
     (optional)
   * for k-mers and second structure: ``intron_seq.fa``, ``5ss_BPs_seq.fa`` 
     (optional), ``BPs_3ss_seq.fa`` (optional)
-  * for mfold second structure results: ``intron_seq.mfold.txt``, 
-    ``5ss_BPs_seq.mfold.txt`` (optional), ``BPs_3ss_seq.mfold.txt`` (optional)
+  * for RNAfold second structure results: ``intron_seq.RNAfold.txt``, 
+    ``5ss_BPs_seq.RNAfold.txt`` (optional), ``BPs_3ss_seq.RNAfold.txt`` 
+    (optional)
 
 As can be seen above, there are 4 types of features 1) length, 2) splice site 
 motif strength, 3) second structure energy 4) frequecy of k-mers. In addition 
 it could produce the motif logo. 
 
-Here, the second structure is predicted by 
-mfold_ and motif logo is produced by webLogo_ v3.0. ``mfold`` prediction usually 
-takes much longer than other parts of the program and will produce many 
-temporary files, at least for its free version, e.g., mfold-3.6.tar.gz_. You 
-could turn off any of these functions off by input ``--no-mfold`` and 
-``--no-weblogo``, respectively. The according output files will not be 
-available.
+Here, the second structure is predicted by RNAfold_ and motif logo is produced 
+by webLogo_ v3.0. ``RNAfold`` is from the ViennaRNA_ Package, and needed be 
+installed beforehand, and available in the `$PATH` variable (see this tutorial_)
+Additionally, you could turn off any of these functions off by input 
+``--no-RNAfold`` and / or ``--no-weblogo``, respectively. The according output 
+files will not be available, consequently.
 
-By default, ``mfold`` use the output directory for temporary 
-files, but you could change it for example to ``/tmp`` by setting 
-``--mfold-run-dir /tmp``. 
-
-In addition, you could choose the range of k-mers, 
-by setting ``--kmer-range 2 4`` (for kmin=2 and kmax=4).
+In addition, you could choose the range of k-mers, by setting 
+``--kmer-range 2 4`` (for kmin=2 and kmax=4).
 
 .. _webLogo: https://github.com/WebLogo/weblogo
-.. _mfold: http://unafold.rna.albany.edu/?q=mfold/download-mfold
-.. _mfold-3.6.tar.gz: http://unafold.rna.albany.edu/download/mfold-3.6.tar.gz
-
+.. _RNAfold: https://www.tbi.univie.ac.at/RNA/documentation.html
+.. _ViennaRNA: https://www.tbi.univie.ac.at/RNA/index.html
+.. _tutorial: https://robots.thoughtbot.com/the-magic-behind-configure-make-make-install
 
 There are more parameters for setting (``intronX -h`` always give the version 
 you are using)
@@ -107,12 +103,8 @@ you are using)
     Optional arguments:
       --kmer-range=KMER_RANGE
                           The min and max K in k-mers. [default: 1 3]
-      --no-mfold          No second strucutre for intron sequences
+      --no-RNAfold        No second strucutre for intron sequences
       --no-weblogo        No weblogo figures for motifs
-      --mfold-run-dir=MFOLD_RUN_DIR
-                          The running directory for mfold with many temporary
-                          files. Default: the same folder of output files. For
-                          one running, better to use /tmp.
 
 
 Examples
