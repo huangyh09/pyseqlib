@@ -72,7 +72,7 @@ def get_RNAfold(fasta_file, out_file=None):
         fout.writelines("\t".join(rt_line) + "\n")
     fout.close()
 
-    return energys
+    return [str(x) for x in energys]
 
 
 def main():
