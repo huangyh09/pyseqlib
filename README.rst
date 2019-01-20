@@ -16,7 +16,8 @@ What's inside?
   we recommend using `pyRNAfold` instead.
 
 * ``pyRNAfold``: a python wrap of for another predictor, RNAfold, of RNA 
-  secondary structure energy. It is from the ViennaRNA_ package.
+  secondary structure energy. It is from the ViennaRNA_ package, which can be 
+  installed from the `source code`_, or from BioConda_.
 
 * ``motif-score``: a motif score calculate
 
@@ -28,7 +29,8 @@ What's inside?
 .. _ViennaRNA: https://www.tbi.univie.ac.at/RNA/index.html
 .. _manual: https://github.com/huangyh09/pyseqlib/blob/master/doc/intronX_manual.rst
 .. _example: https://sourceforge.net/projects/pyseqlib/files/intronX-example/
-
+.. _source code: https://www.tbi.univie.ac.at/RNA/
+.. _BioConda: https://anaconda.org/bioconda/viennarna
 
 How to install?
 ---------------
