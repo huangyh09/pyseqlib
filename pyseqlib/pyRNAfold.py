@@ -55,7 +55,7 @@ def parse_RNAfold_out(RNAfold_out):
     return RNA_ids, seq_len, energys
 
 
-def get_RNAfold(fasta_file, out_file=None, verbose=True):
+def get_RNAfold(fasta_file, out_file=None):
     """get energy score from mfold. Make sure you have installed mfold.
     """
     bashCommand = "RNAfold --noPS %s" %(fasta_file) 
@@ -63,6 +63,8 @@ def get_RNAfold(fasta_file, out_file=None, verbose=True):
     RNAfold_output = process.communicate()[0]
     RNA_ids, seq_len, energys =  parse_RNAfold_out(RNAfold_output)
     
+    if out_file is None:
+        out_file = ".".join(fasta_file.split(".")[:-1]) + ".RNAfold.txt"
     fout = open(out_file, "w")
     fout.writelines("IDs\tlength\tenergy\n")
     for i in range(len(energys)):
