@@ -7,6 +7,7 @@ from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
+from Cython.Build import cythonize
 
 here = path.abspath(path.dirname(__file__))
 
@@ -46,7 +47,7 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=find_packages(),#[''],#
-
+    ext_modules=cythonize('pyseqlib/utils/*.pyx'),
     entry_points={
           'console_scripts': [
           'pymfold = pyseqlib.pymfold:main',
