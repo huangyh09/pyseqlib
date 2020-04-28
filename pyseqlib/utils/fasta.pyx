@@ -37,12 +37,12 @@ class LightFasta:
             try:
                 idx = self.ref.index("chr" + qref.split("chr")[-1])
             except ValueError:
-                print （"No reference id as the query: %s" %qref）
+                print ("No reference id as the query: %s" %qref)
                 return None
         try:
             RV = self.seq[idx][start-1 : stop]
         except ValueError:
-            print （"Wrong start or stop position: %d, %d" %(start, stop)）
+            print ("Wrong start or stop position: %d, %d" %(start, stop))
             return None
         return RV
 
