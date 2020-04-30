@@ -3,6 +3,7 @@
 import os
 import numpy as np
 from pyseqlib.utils.fasta import *
+import errno
 
 def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
     """generate the sequence feature of introns.
