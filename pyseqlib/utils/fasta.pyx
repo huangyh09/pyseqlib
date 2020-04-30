@@ -160,7 +160,7 @@ def fasta_write(fid, seq, ref, length=60):
     """
     fid.writelines(">" + ref + "\n")
     i = -1
-    for i in range(len(seq) / length):
+    for i in range(int(len(seq) / length)):
         fid.writelines(seq[i*length:(i+1)*length] + "\n")
     if (i+1)*length < len(seq):
         fid.writelines(seq[(i+1)*length:] + "\n")
