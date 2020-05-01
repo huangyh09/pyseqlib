@@ -73,7 +73,7 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
             else:
                 chrom = "chr" + chrom
         if chrom not in fastaFile.f.references:
-            print("Error: can't find %s in fasta file." %(intron_info[i,2]))
+            print("Error: can't find %s in fasta file." %(intron_info[i,3]))
             sys.exit(1)
 
         if strand == "+":
