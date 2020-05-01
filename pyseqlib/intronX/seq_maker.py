@@ -61,11 +61,11 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
     seq_3ss = []
     seq_BPs = []
     for i in range(intron_info.shape[0]):
-        UPs = int(intron_info[i,5])
-        DNs = int(intron_info[i,6])
-        BPs = int(intron_info[i,7])
-        chrom = str(intron_info[i,3])
-        strand = str(intron_info[i,4])
+        UPs = int(float(intron_info[i,4]))
+        DNs = int(float(intron_info[i,5]))
+        BPs = int(float(intron_info[i,6]))
+        chrom = str(intron_info[i,2])
+        strand = str(intron_info[i,3])
 
         if chrom not in fastaFile.f.references:
             if chrom.count("chr") > 0:
