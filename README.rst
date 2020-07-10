@@ -51,6 +51,12 @@ github repository and then run the following command line:
 
     python setup.py install
 
+Or 
+
+::
+
+    pip install -U git+https://github.com/huangyh09/pyseqlib
+
 If you don't have the root permission, add ``--user``.
 
 Rquired libraries: ``pysam``,  ``numpy``, ``Cython``.
