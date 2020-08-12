@@ -4,7 +4,7 @@ import os
 import numpy as np
 from pyseqlib.utils.fasta import *
 
-def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
+def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3, ss3_range=35):
     """generate the sequence feature of introns.
     1. motif sequence of 5 splice site: -4  to +7
     2. motif sequence of branch point:  -7  to +3
@@ -36,6 +36,7 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
     $out_dir/intron_seq.fa
     $out_dir/5ss_BPs_seq.fa
     $out_dir/BPs_3ss_seq.fa
+    $out_dir/3ss_local_seq.fa
     """
 
     fastaFile = FastaFile(fasta_file)
@@ -52,6 +53,7 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
     fid4 = open(out_dir + "/intron_seq.fa","w")
     fid5 = open(out_dir + "/5ss_BPs_seq.fa","w")
     fid6 = open(out_dir + "/BPs_3ss_seq.fa","w")
+    fid7 = open(out_dir + "/3ss_local_seq.fa","w")
 
     kmer_lst = get_kmer_all(kmax=kmax, kmin=kmin, seqs="AUGC")
     kmer_frq = np.zeros((intron_info.shape[0], len(kmer_lst)))
@@ -83,6 +85,8 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
             _seq_intron  = fastaFile.get_seq(chrom, UPs, DNs)
             _seq_5ss_BPs = fastaFile.get_seq(chrom, UPs, BPs-1)
             _seq_BPs_3ss = fastaFile.get_seq(chrom, BPs+1, DNs)
+            _seq_3ss_local = fastaFile.get_seq(chrom, DNs-ss3_range, 
+                                               DNs+ss3_range)
         else :
             _seq_5ss = rev_seq(fastaFile.get_seq(chrom, DNs-7,  DNs+4))
             _seq_BPs = rev_seq(fastaFile.get_seq(chrom, BPs-3,  BPs+7))
@@ -91,6 +95,8 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
             _seq_intron  = rev_seq(fastaFile.get_seq(chrom, UPs, DNs))
             _seq_5ss_BPs = rev_seq(fastaFile.get_seq(chrom, BPs+1, DNs))
             _seq_BPs_3ss = rev_seq(fastaFile.get_seq(chrom, UPs, BPs-1))
+            _seq_3ss_local = rev_seq(fastaFile.get_seq(chrom, UPs-ss3_range, 
+                                                       UPs+ss3_range))
             
         seq_5ss.append(_seq_5ss)
         seq_BPs.append(_seq_BPs)
@@ -106,6 +112,7 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
         fasta_write(fid4, cDNA2RNA(_seq_intron),  intron_info[i,1], length=60)
         fasta_write(fid5, cDNA2RNA(_seq_5ss_BPs), intron_info[i,1], length=60)
         fasta_write(fid6, cDNA2RNA(_seq_BPs_3ss), intron_info[i,1], length=60)
+        fasta_write(fid7, cDNA2RNA(_seq_3ss_local), intron_info[i,1], length=60)
 
     fid1.close()
     fid2.close()
@@ -113,6 +120,7 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3):
     fid4.close()
     fid5.close()
     fid6.close()
+    fid7.close()
 
     RV = {}
     RV["seq_5ss"] = seq_5ss

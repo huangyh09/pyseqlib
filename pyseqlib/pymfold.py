@@ -30,7 +30,6 @@ from .utils.fasta import LightFasta
 
 def get_mfold(fasta_file, out_file=None, run_dir=None, verbose=True):
     """get energy score from mfold. Make sure you have installed mfold.
-
     """
     fastaFile  = LightFasta(fasta_file) 
     if out_file is None:
