@@ -58,9 +58,9 @@ def Kmer_scan(fasta_file, out_dir=None, K=8, n_gene=None, base_list='ACGU'):
                 #seq_code_list += _code_list
                 #print(_idx_list)
     # print(len(seq_code_list), len(np.unique(seq_code_list)))
-    
+    # print(gene_list)
+
     ## Keep found listed genes
     count_matrix = count_matrix[:(_gene_idx+1), :]
-    print(gene_list)
 
     return count_matrix, gene_list, Kmer_list
