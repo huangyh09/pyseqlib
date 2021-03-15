@@ -35,7 +35,7 @@ def Kmer_scan(fasta_file, out_dir=None, K=8, n_gene=None, base_list='ACGU'):
     """
     N_base = len(base_list)
     if n_gene is None:
-        n_gene = 2000000 # a default big value
+        n_gene = 1000000 # a default big value
 
     gene_list = []    
     Kmer_list = get_kmer_all(K, K, base_list)
