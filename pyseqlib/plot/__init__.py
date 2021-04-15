@@ -2,4 +2,4 @@
 # Licensed under the MIT License at
 # http://opensource.org/licenses/MIT
 
-from seq_plot import *
+from .seq_plot import *
