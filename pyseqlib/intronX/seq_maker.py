@@ -85,8 +85,10 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3, ss3_range=35):
             _seq_intron  = fastaFile.get_seq(chrom, UPs, DNs)
             _seq_5ss_BPs = fastaFile.get_seq(chrom, UPs, BPs-1)
             _seq_BPs_3ss = fastaFile.get_seq(chrom, BPs+1, DNs)
-            _seq_3ss_local = fastaFile.get_seq(chrom, DNs-ss3_range, 
+            _seq_3ss_local = fastaFile.get_seq(chrom, BPs+1, 
                                                DNs+ss3_range)
+#             _seq_3ss_local = fastaFile.get_seq(chrom, DNs-ss3_range, 
+#                                                DNs+ss3_range)
         else :
             _seq_5ss = rev_seq(fastaFile.get_seq(chrom, DNs-7,  DNs+4))
             _seq_BPs = rev_seq(fastaFile.get_seq(chrom, BPs-3,  BPs+7))
@@ -95,8 +97,10 @@ def seq_maker(intron_info, fasta_file, out_dir, kmin=1, kmax=3, ss3_range=35):
             _seq_intron  = rev_seq(fastaFile.get_seq(chrom, UPs, DNs))
             _seq_5ss_BPs = rev_seq(fastaFile.get_seq(chrom, BPs+1, DNs))
             _seq_BPs_3ss = rev_seq(fastaFile.get_seq(chrom, UPs, BPs-1))
+#             _seq_3ss_local = rev_seq(fastaFile.get_seq(chrom, UPs-ss3_range, 
+#                                                        UPs+ss3_range))
             _seq_3ss_local = rev_seq(fastaFile.get_seq(chrom, UPs-ss3_range, 
-                                                       UPs+ss3_range))
+                                                       BPs-1))
             
         seq_5ss.append(_seq_5ss)
         seq_BPs.append(_seq_BPs)
