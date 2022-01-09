@@ -3,7 +3,7 @@
 import numpy as np
 from .fasta import get_kmer_all
 
-def Kmer_encoder(seq, last_seq_codes=None, K=5, base_list='ACGU'):
+def Kmer_encoder(seq, last_seq_codes=None, K=6, base_list='ACGU'):
     """get the octmer index
     """
     # code_dict = {'A': 0, 'C': 1, 'G': 2, 'U': 3}
@@ -30,7 +30,7 @@ def Kmer_encoder(seq, last_seq_codes=None, K=5, base_list='ACGU'):
     return RT_vals, seq_codes
 
 
-def Kmer_scan(fasta_file, out_dir=None, K=5, n_gene=None, base_list='ACGU'):
+def Kmer_scan(fasta_file, out_dir=None, K=6, n_gene=None, base_list='ACGU'):
     """Scan Octmers in a sequence
     """
     N_base = len(base_list)
